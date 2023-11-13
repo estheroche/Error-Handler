@@ -1,8 +1,5 @@
 # Error-Handler in Smart Contract
 
-##  Table of Content
-
-- [Contract details](#contract-details)
 
 An error handler is a mechanism in software development that deals with errors or exceptions that may occur during the execution of a program. Errors can happen for various reasons, such as incorrect user input, hardware failures, or unexpected conditions in the program.
 
