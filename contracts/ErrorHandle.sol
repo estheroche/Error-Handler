@@ -64,7 +64,8 @@ contract Escrow {
         if (sellerConfirmed) {
             currentState = State.Completed;
             emit FundsReleased();
-            payable(seller).transfer(amount);
+            // Using assert to check for unexpected conditions (e.g., overflow)
+            assert(payable(seller).send(amount));
         }
     }
 
@@ -76,18 +77,27 @@ contract Escrow {
         if (buyerConfirmed) {
             currentState = State.Completed;
             emit FundsReleased();
-            payable(seller).transfer(amount);
+            // Using revert to handle unexpected conditions (e.g., insufficient gas)
+            require(
+                payable(seller).send(amount),
+                "Failed to send funds to the seller"
+            );
         }
     }
 
     function cancelTransaction() external inState(State.BuyerPaid) {
+        // Using require for a regular condition
         require(
             msg.sender == arbiter,
             "Only the arbiter can cancel the transaction"
         );
         currentState = State.Cancelled;
         emit FundsReleased();
-        payable(buyer).transfer(amount);
+        // Using revert to handle unexpected conditions
+        require(
+            payable(buyer).send(amount),
+            "Failed to refund funds to the buyer"
+        );
     }
 
     // Fallback function to reject any ether sent to the contract
