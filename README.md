@@ -5,33 +5,80 @@ An error handler is a mechanism in software development that deals with errors o
 
 The primary purpose of an error handler is to gracefully manage these errors, preventing them from causing the entire program to crash or behave unpredictably. Instead, the error handler allows the program to respond to errors in a controlled manner, often by providing meaningful error messages, logging relevant information for debugging, and potentially taking corrective actions.
 
-## Contract Structure:
+## Contract Structure:  Escrow Contract
 
-### State Variables:
+
+### buyer, seller, arbiter: 
+
+Addresses representing the buyer, seller, and a third-party arbiter. amount: The amount of ether involved in the transaction.
+
+### buyerConfirmed, sellerConfirmed: 
+
+Booleans indicating whether the buyer and seller have confirmed the transaction.
+
+### currentState: 
+
+An enumeration named State representing the current state of the escrow contract. It has states such as Initialized, BuyerPaid, SellerConfirmed, Completed, and Cancelled.
+
+### Modifiers:
         
-`address public owner;:` An Ethereum address representing the owner of the contract.
+#### onlyBuyer: 
 
-`uint256 public currentValue;`: An unsigned integer variable to store the current value.
+Restricts the execution of a function to only the buyer.
 
-`Modifiers`:
+#### onlySeller:
+
+ Restricts the execution of a function to only the seller.
+
+#### inState: 
+
+Ensures that a function can only be called in a specific state.
+
+### Events:
         
-`modifier onlyOwner() {...}`:
+#### FundsDeposited: 
 
- A custom modifier that restricts certain functions to be callable only by the contract owner. It uses the require statement to check if the caller is the owner before allowing the function to execute.
+Emitted when the buyer deposits funds into the escrow.
+        
+#### BuyerConfirmed:
 
-- Constructor:
+ Emitted when the buyer confirms receipt.
 
-`constructor() {...}`: The constructor function sets the initial values when the contract is deployed. It initializes the owner with the address that deploys the contract and sets currentValue to 0.
+#### SellerConfirmed: 
 
-- Functions:
+Emitted when the seller confirms delivery.
+        
+#### FundsReleased:
 
- `function updateValue(uint256 _newValue) external onlyOwner {...}`: 
- 
- A function that allows the owner to update the currentValue. It includes input validation using require, internal error checking using assert, and handling unexpected conditions using revert.
+ Emitted when funds are released, indicating that the transaction is either completed or canceled.
 
-`function withdraw() external view onlyOwner {...}`: 
+### Constructor:
 
-A function for the owner to withdraw funds, with a condition check using require. It also includes a condition using revert to handle unexpected situations.
+Initializes the contract with the buyer's address, seller's address, and arbiter's address. The initial state is set to Initialized.
+
+### Functions:
+        
+#### depositFunds:
+
+Allows the buyer to deposit funds into the escrow. It transitions the state to BuyerPaid.
+        
+#### confirmReceipt:
+
+Allows the buyer to confirm the receipt of the item. If both buyer and seller have confirmed, the funds are released to the seller, and the state becomes Completed.
+
+#### confirmDelivery:
+
+Allows the seller to confirm the delivery of the item. If both buyer and seller have confirmed, the funds are released to the seller, and the state becomes Completed.
+
+#### cancelTransaction:
+
+Allows the arbiter to cancel the transaction, returning funds to the buyer. The state becomes Cancelled.
+
+### Fallback Function:
+
+A fallback function is implemented to reject any direct payments sent to the contract.
+
+This contract is designed to facilitate a simple escrow transaction where the buyer deposits funds, confirms receipt, the seller confirms delivery, and an arbiter can cancel the transaction if needed. The contract aims to ensure a fair and secure exchange of goods or services.
 
 ### Conclusion:
 
